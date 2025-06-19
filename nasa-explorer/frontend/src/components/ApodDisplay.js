@@ -1,34 +1,33 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import './Card.css';
 
-function ApodDisplay() {
-  const [apodData, setApodData] = useState(null);
+const ApodDisplay = () => {
+  const [apod, setApod] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
-    axios.get('https://nasa-backend-hfke.onrender.com/api/apod')
-      .then(response => {
-        setApodData(response.data);
+    axios.get('https://your-backend.onrender.com/api/apod')
+      .then(res => {
+        setApod(res.data);
         setLoading(false);
       })
       .catch(err => {
-        setError('Failed to fetch APOD data');
+        console.error(err);
         setLoading(false);
       });
   }, []);
 
-  if (loading) return <p>Loading Astronomy Picture of the Day...</p>;
-  if (error) return <p>{error}</p>;
+  if (loading) return <p className="loading">Loading Astronomy Picture...</p>;
+  if (!apod) return <p className="error">Failed to fetch APOD.</p>;
 
   return (
-    <div>
-      <h2>{apodData.title}</h2>
-      <img src={apodData.url} alt={apodData.title} style={{ maxWidth: '100%' }} />
-      <p>{apodData.explanation}</p>
-      <p><small>Date: {apodData.date}</small></p>
+    <div className="card">
+      <h2>{apod.title}</h2>
+      <img src={apod.url} alt={apod.title} className="image" />
+      <p>{apod.explanation}</p>
     </div>
   );
-}
+};
 
 export default ApodDisplay;
