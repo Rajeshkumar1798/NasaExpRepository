@@ -1,23 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import './Card.css';
 
-const ROVERS = ['Curiosity', 'Opportunity', 'Spirit'];
+const ROVERS = ['curiosity', 'opportunity', 'spirit'];
 
 export default function MarsRoverPhotos() {
   const [photos, setPhotos] = useState([]);
   const [date, setDate] = useState('2021-06-03');
-  const [rover, setRover] = useState('Curiosity');
+  const [rover, setRover] = useState('curiosity');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const fetchPhotos = () => {
+  useEffect(() => {
     setLoading(true);
-    axios.get(`https://nasa-backend-hfke.onrender.com/api/mars?date=${date}&rover=${rover.toLowerCase()}`)
+    setError('');
+    axios.get(`https://nasa-backend-hfke.onrender.com/api/mars`, { params: { date, rover } })
       .then(res => setPhotos(res.data.photos || []))
-      .catch(console.error)
+      .catch(() => setError('Error fetching Mars photos'))
       .finally(() => setLoading(false));
-  };
-
-  useEffect(fetchPhotos, [date, rover]);
+  }, [date, rover]);
 
   return (
     <div className="card">
@@ -26,12 +27,13 @@ export default function MarsRoverPhotos() {
         <label>Date: <input type="date" value={date} onChange={e => setDate(e.target.value)} /></label>
         <label>Rover:
           <select value={rover} onChange={e => setRover(e.target.value)}>
-            {ROVERS.map(r => <option key={r}>{r}</option>)}
+            {ROVERS.map(r => <option key={r} value={r}>{r}</option>)}
           </select>
         </label>
       </div>
       {loading && <div className="loader">Loading...</div>}
-      {!loading && photos.length === 0 && <div className="error">No photos for this date/rover</div>}
+      {error && <div className="error">{error}</div>}
+      {!loading && !error && photos.length === 0 && <div>No photos available.</div>}
       <div className="grid">
         {photos.map(p => (
           <div key={p.id} className="photo-card">

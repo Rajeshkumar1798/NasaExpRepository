@@ -3,7 +3,7 @@ import React from 'react';
 function Tabs({ active, setActive }) {
   return (
     <div className="tabs">
-      {['APOD', 'Mars'].map(tab => (
+      {['APOD', 'Mars', 'EPIC'].map(tab => (
         <button
           key={tab}
           className={active === tab ? 'active-tab' : ''}
