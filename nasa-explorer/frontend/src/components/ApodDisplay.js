@@ -7,7 +7,7 @@ const ApodDisplay = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios.get('https://your-backend.onrender.com/api/apod')
+    axios.get('https://nasa-backend-hfke.onrender.com')
       .then(res => {
         setApod(res.data);
         setLoading(false);

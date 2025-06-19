@@ -6,14 +6,17 @@ const MarsRoverPhotos = () => {
   const [photos, setPhotos] = useState([]);
   const [date, setDate] = useState('2024-01-01');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const fetchPhotos = async () => {
     setLoading(true);
     try {
       const res = await axios.get(`https://your-backend.onrender.com/api/mars?date=${date}`);
       setPhotos(res.data.photos);
+      setError('');
     } catch (err) {
-      console.error('Error fetching Mars data:', err);
+      console.error(err);
+      setError('Error fetching Mars photos');
     } finally {
       setLoading(false);
     }
@@ -25,9 +28,15 @@ const MarsRoverPhotos = () => {
 
   return (
     <div className="card">
-      <h2>Mars Rover Photos ({date})</h2>
-      <input type="date" value={date} onChange={e => setDate(e.target.value)} />
-      {loading ? <p className="loading">Loading...</p> : null}
+      <h2>Mars Rover Photos</h2>
+      <input
+        type="date"
+        value={date}
+        onChange={e => setDate(e.target.value)}
+      />
+      {loading && <p className="loading">Loading...</p>}
+      {error && <p className="error">{error}</p>}
+      {photos.length === 0 && !loading && <p>No photos available for this date.</p>}
       <div className="grid">
         {photos.map(photo => (
           <div key={photo.id}>

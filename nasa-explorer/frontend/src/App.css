@@ -16,9 +16,3 @@ h1 {
   text-align: center;
   color: #66fcf1;
 }
-
-input[type='date'] {
-  padding: 0.5rem;
-  font-size: 1rem;
-  margin: 1rem 0;
-}
