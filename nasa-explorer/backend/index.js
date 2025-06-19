@@ -4,9 +4,14 @@ const cors = require('cors');
 const axios = require('axios');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 10000;
 
 app.use(cors());
+
+// ✅ Root route to prevent "Cannot GET /"
+app.get('/', (req, res) => {
+  res.send('🚀 NASA Explorer Backend is live! Try /api/apod or /api/mars');
+});
 
 // Astronomy Picture of the Day (APOD)
 app.get('/api/apod', async (req, res) => {
