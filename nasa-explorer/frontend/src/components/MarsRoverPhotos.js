@@ -11,7 +11,7 @@ const MarsRoverPhotos = () => {
   const fetchPhotos = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`https://your-backend.onrender.com/api/mars?date=${date}`);
+      const res = await axios.get(`https://nasa-backend-hfke.onrender.com/api/mars?date=${date}`);
       setPhotos(res.data.photos);
       setError('');
     } catch (err) {
