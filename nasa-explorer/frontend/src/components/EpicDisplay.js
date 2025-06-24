@@ -3,7 +3,9 @@ import axios from 'axios';
 import './Card.css';
 
 export default function EpicDisplay({ token }) {
-  const [images, setImages] = useState([]);
+  const [imagesByDate, setImagesByDate] = useState({});
+  const [dates, setDates] = useState([]);
+  const [selectedDate, setSelectedDate] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -16,11 +18,20 @@ export default function EpicDisplay({ token }) {
     setLoading(true);
     axios
       .get('https://nasa-backend-hfke.onrender.com/api/epic', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       })
-      .then((res) => setImages(res.data || []))
+      .then((res) => {
+        const grouped = res.data.reduce((acc, img) => {
+          const date = img.date.split(' ')[0];
+          if (!acc[date]) acc[date] = [];
+          acc[date].push(img);
+          return acc;
+        }, {});
+        const dateList = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
+        setImagesByDate(grouped);
+        setDates(dateList);
+        setSelectedDate(dateList[0]);
+      })
       .catch((err) => {
         console.error(err);
         if (err.response && err.response.status === 401) {
@@ -39,14 +50,30 @@ export default function EpicDisplay({ token }) {
 
   return (
     <div className="card">
-      <h2>EPIC (Earth Polychromatic)</h2>
+      <h2>🌍 EPIC (Earth Polychromatic Camera)</h2>
       {loading && <div className="loader">Loading...</div>}
       {error && <div className="error">{error}</div>}
+
+      {/* Date Selector */}
+      <div className="chip-container">
+        {dates.map((d) => (
+          <button
+            key={d}
+            onClick={() => setSelectedDate(d)}
+            className={`chip ${d === selectedDate ? 'active' : ''}`}
+          >
+            {d}
+          </button>
+        ))}
+      </div>
+
+      {/* Image Display */}
       <div className="grid">
-        {images.map((img) => (
+        {imagesByDate[selectedDate]?.map((img) => (
           <div key={img.identifier} className="photo-card">
-            <img src={buildUrl(img)} alt="EPIC Earth" />
-            <p><strong>Date:</strong> {img.date.split(' ')[0]}</p>
+            <img src={buildUrl(img)} alt={img.caption} />
+            <p><strong>{img.caption}</strong></p>
+            <p>{new Date(img.date).toLocaleString()}</p>
           </div>
         ))}
       </div>

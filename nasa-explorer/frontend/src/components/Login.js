@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import './AuthForm.css';
 
 export default function Login({ onLogin }) {
   const [username, setUsername] = useState('');
@@ -17,9 +18,9 @@ export default function Login({ onLogin }) {
       });
 
       const data = await res.json();
-      if (res.ok) {
+      if (res.ok && data.token) {
         localStorage.setItem('token', data.token);
-        onLogin(username);
+        onLogin(username, data.token);
       } else {
         setError(data.message || 'Login failed');
       }
@@ -29,24 +30,26 @@ export default function Login({ onLogin }) {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Login</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <input
-        type="text"
-        placeholder="Username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        required
-      /><br />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        required
-      /><br />
-      <button type="submit">Login</button>
-    </form>
+    <div className="auth-form">
+      <h2>🔐 Login</h2>
+      {error && <p className="error">{error}</p>}
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          required
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+        <button type="submit">Login</button>
+      </form>
+    </div>
   );
 }

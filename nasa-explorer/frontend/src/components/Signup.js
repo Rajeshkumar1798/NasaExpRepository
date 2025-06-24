@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import './AuthForm.css';
 
-export default function Signup() {
+export default function Signup({ onSignup }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
@@ -17,11 +18,14 @@ export default function Signup() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
       });
+
       const data = await res.json();
-      if (res.ok) {
-        setMessage('Signup successful! You can now login.');
+      if (res.ok && data.token) {
+        localStorage.setItem('token', data.token);
+        setMessage('Signup successful!');
         setUsername('');
         setPassword('');
+        onSignup(username, data.token);
       } else {
         setError(data.message || 'Signup failed');
       }
@@ -31,25 +35,27 @@ export default function Signup() {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Signup</h2>
-      {message && <p style={{ color: 'green' }}>{message}</p>}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <input
-        type="text"
-        placeholder="Username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        required
-      /><br />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        required
-      /><br />
-      <button type="submit">Signup</button>
-    </form>
+    <div className="auth-form">
+      <h2>📝 Signup</h2>
+      {message && <p className="success">{message}</p>}
+      {error && <p className="error">{error}</p>}
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          required
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+        <button type="submit">Signup</button>
+      </form>
+    </div>
   );
 }

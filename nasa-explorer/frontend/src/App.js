@@ -9,30 +9,44 @@ import './App.css';
 
 function App() {
   const [active, setActive] = useState('APOD');
-  const [username, setUsername] = useState(localStorage.getItem('username') || '');
+  const [username, setUsername] = useState('');
+  const [token, setToken] = useState('');
   const [showSignup, setShowSignup] = useState(false);
 
-  // When user logs in
-  const handleLogin = (user) => {
+  // Load user session on mount
+  useEffect(() => {
+    const savedUsername = localStorage.getItem('username');
+    const savedToken = localStorage.getItem('token');
+    if (savedUsername && savedToken) {
+      setUsername(savedUsername);
+      setToken(savedToken);
+    }
+  }, []);
+
+  // Handle login success
+  const handleLogin = (user, jwtToken) => {
     setUsername(user);
+    setToken(jwtToken);
     localStorage.setItem('username', user);
+    localStorage.setItem('token', jwtToken);
   };
 
   // Logout function
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('username');
     setUsername('');
+    setToken('');
+    localStorage.removeItem('username');
+    localStorage.removeItem('token');
   };
 
-  if (!username) {
-    // Show login or signup if not logged in
+  // Show login/signup if not authenticated
+  if (!token) {
     return (
       <div className="container">
         <h1>🌌 NASA Explorer</h1>
         {showSignup ? (
           <>
-            <Signup />
+            <Signup onSignup={(user, jwtToken) => handleLogin(user, jwtToken)} />
             <p>
               Already have an account?{' '}
               <button onClick={() => setShowSignup(false)}>Login</button>
@@ -42,7 +56,7 @@ function App() {
           <>
             <Login onLogin={handleLogin} />
             <p>
-              Don't have an account?{' '}
+              Don’t have an account?{' '}
               <button onClick={() => setShowSignup(true)}>Signup</button>
             </p>
           </>
@@ -51,12 +65,12 @@ function App() {
     );
   }
 
-  // If logged in, show the main app with tabs
+  // Authenticated view
   return (
     <div className="container">
       <h1>🌌 NASA Explorer</h1>
       <p>
-        Welcome, {username}!{' '}
+        Welcome, <strong>{username}</strong>!
         <button onClick={handleLogout} style={{ marginLeft: '10px' }}>
           Logout
         </button>
@@ -64,13 +78,11 @@ function App() {
       <Tabs active={active} setActive={setActive} />
       {active === 'APOD' && <ApodDisplay />}
       {active === 'Mars' && <MarsRoverPhotos />}
-      {/* Pass token to EpicDisplay */}
-      {active === 'EPIC' && (
-        <EpicDisplay token={localStorage.getItem('token')} />
-      )}
+      {active === 'EPIC' && <EpicDisplay token={token} />}
     </div>
   );
 }
 
 export default App;
+
 
