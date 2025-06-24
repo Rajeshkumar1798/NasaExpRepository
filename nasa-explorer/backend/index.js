@@ -8,15 +8,19 @@ const bcrypt = require('bcryptjs');
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-app.use(cors());
-app.use(express.json()); // To parse JSON body
+app.use(cors({
+  origin: 'http://localhost:3000', // ✅ Match your frontend
+  credentials: true
+}));
 
-const users = []; // In-memory user store (temporary)
+app.use(express.json());
 
-// 🔐 Middleware to verify JWT token
+const users = []; // In-memory storage
+
+// 🔐 Middleware to verify token
 function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
-  const token = authHeader?.split(' ')[1]; // Bearer <token>
+  const token = authHeader?.split(' ')[1];
   if (!token) return res.status(401).json({ message: 'Missing token' });
 
   jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
@@ -26,12 +30,12 @@ function authenticateToken(req, res, next) {
   });
 }
 
-// 🟢 Root route
+// ✅ Health check route
 app.get('/', (req, res) => {
-  res.send('🚀 NASA Explorer Backend is live! Try /api/apod or /api/mars');
+  res.send('🚀 NASA Explorer Backend is live!');
 });
 
-// 🔐 Signup
+// 📝 Signup
 app.post('/api/signup', async (req, res) => {
   const { username, password } = req.body;
   if (users.find(u => u.username === username)) {
@@ -43,7 +47,7 @@ app.post('/api/signup', async (req, res) => {
   res.status(201).json({ message: 'User registered successfully' });
 });
 
-// 🔐 Login and generate token
+// 🔐 Login
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
   const user = users.find(u => u.username === username);
@@ -52,13 +56,11 @@ app.post('/api/login', async (req, res) => {
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) return res.status(401).json({ message: 'Invalid credentials' });
 
-  // 🔐 Sign the token
   const token = jwt.sign({ username }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
   res.json({ token });
 });
 
-// ✅ Public: APOD endpoint
+// 🛰️ APOD (Public)
 app.get('/api/apod', async (req, res) => {
   try {
     const response = await axios.get(
@@ -71,7 +73,7 @@ app.get('/api/apod', async (req, res) => {
   }
 });
 
-// ✅ Public: Mars Rover endpoint
+// 🪐 Mars (Public)
 app.get('/api/mars', async (req, res) => {
   try {
     const date = req.query.date || '2024-01-01';
@@ -87,7 +89,7 @@ app.get('/api/mars', async (req, res) => {
   }
 });
 
-// 🔐 Protected: EPIC endpoint
+// 🌍 EPIC (Protected)
 app.get('/api/epic', authenticateToken, async (req, res) => {
   try {
     const response = await axios.get(

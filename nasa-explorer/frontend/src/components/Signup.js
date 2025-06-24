@@ -20,12 +20,11 @@ export default function Signup({ onSignup }) {
       });
 
       const data = await res.json();
-      if (res.ok && data.token) {
-        localStorage.setItem('token', data.token);
-        setMessage('Signup successful!');
+      if (res.ok) {
+        setMessage('Signup successful! You can now login.');
         setUsername('');
         setPassword('');
-        onSignup(username, data.token);
+        // ✅ No need to store token or call callback here
       } else {
         setError(data.message || 'Signup failed');
       }

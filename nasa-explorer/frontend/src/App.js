@@ -24,11 +24,13 @@ function App() {
   }, []);
 
   // Handle login success
-  const handleLogin = (user, jwtToken) => {
+  const handleLogin = (user) => {
     setUsername(user);
-    setToken(jwtToken);
+    const jwtToken = localStorage.getItem('token');
+    if (jwtToken) {
+      setToken(jwtToken);
+    }
     localStorage.setItem('username', user);
-    localStorage.setItem('token', jwtToken);
   };
 
   // Logout function
@@ -46,7 +48,7 @@ function App() {
         <h1>🌌 NASA Explorer</h1>
         {showSignup ? (
           <>
-            <Signup onSignup={(user, jwtToken) => handleLogin(user, jwtToken)} />
+            <Signup onSignup={() => setShowSignup(false)} />
             <p>
               Already have an account?{' '}
               <button onClick={() => setShowSignup(false)}>Login</button>
@@ -84,5 +86,3 @@ function App() {
 }
 
 export default App;
-
-

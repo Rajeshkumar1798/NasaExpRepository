@@ -19,8 +19,8 @@ export default function Login({ onLogin }) {
 
       const data = await res.json();
       if (res.ok && data.token) {
-        localStorage.setItem('token', data.token);
-        onLogin(username, data.token);
+        localStorage.setItem('token', data.token); // ✅ Save token
+        onLogin(username); // ✅ Pass only username
       } else {
         setError(data.message || 'Login failed');
       }
