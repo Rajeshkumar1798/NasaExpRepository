@@ -1,0 +1,103 @@
+# NASA Explorer
+
+NASA Explorer is a full-stack web application that allows users to explore fascinating NASA data including Astronomy Picture of the Day (APOD), Mars Rover photos, and EPIC Earth images. The app includes user authentication (Signup/Login), protected routes for EPIC data, and a responsive, user-friendly interface.
+
+---------------------------------------------------------------------------------------------------------------------------------
+
+For Live visit 
+🌐 Frontend:
+https://nasa-frontend-ntvm.onrender.com
+
+📦 Backend (deployed via Render):
+Configured to serve NASA data and handle authentication.
+
+⚠️ Important Note:
+Backend uses in-memory storage. Signups will reset if the server restarts.
+Initial load may take ~30 seconds due to Render's free-tier cold starts.
+
+-----------------------------------------------------------------------------------------------------------------------------
+Features
+
+Authentication (Security Features)
+- User **Signup/Login** using `JWT` tokens.
+- Passwords are securely hashed using `bcryptjs`.
+- Protected route (`/api/epic`) that only allows access with a valid JWT token.
+- JWTs stored in `localStorage`, username saved for user-friendly session persistence.
+- CORS configured securely for both `localhost` and deployed frontend.
+- `.env` used for API keys and secret management.
+
+Frontend (React)
+- **Tabs UI** to switch between APOD, Mars Rover, and EPIC views.
+- **Login & Signup Forms** with error handling and dynamic messaging.
+- **Authenticated view** shows personalized greeting and logout functionality.
+- **APOD View**: Displays NASA's Astronomy Picture of the Day with title, media, and explanation.
+- **Mars Rover View**: Allows users to filter photos by rover name and date.
+- **EPIC View** (protected): Displays recent Earth images using NASA’s EPIC API (requires login).
+- Responsive design with visually pleasing dark theme.
+
+Backend (Node.js + Express)
+- Express server with multiple REST API endpoints:
+  - `/api/signup` – Register a user.
+  - `/api/login` – Authenticate and return a JWT.
+  - `/api/apod` – Fetch public NASA APOD data.
+  - `/api/mars` – Fetch public Mars Rover images.
+  - `/api/epic` – Protected route for EPIC Earth data (requires token).
+- Error handling for all endpoints.
+- Secure CORS setup with allowed origins and credential support.
+
+--------------------------------------------------------------------------------------------------------------------------------
+Tech Stack
+
+Frontend
+- React
+- CSS (Custom styling)
+- JavaScript (ES6+)
+- Fetch API
+
+Backend
+- Node.js
+- Express.js
+- Axios
+- JWT (jsonwebtoken)
+- bcryptjs
+- dotenv
+- CORS
+
+External APIs
+- NASA API (APOD, Mars Rover, EPIC)
+  - [https://api.nasa.gov](https://api.nasa.gov)
+
+-----------------------------------------------------------------------------------------------------------------------------------
+Accomplishments
+
+- Implemented **secure full-stack JWT-based authentication**.
+- Integrated **3 NASA APIs** into user-friendly tabs.
+- Built protected route logic using middleware.
+- Configured backend and frontend for **cross-origin compatibility**.
+- Created complete **session persistence** using `localStorage`.
+- Added **loader/error handling** for smoother UX.
+- App runs both locally and is **ready for deployment** (frontend on Render/Vercel, backend on Render/Node host).
+
+----------------------------------------------------------------------------------------------------------------------------------
+Getting Started (Local Setup)
+
+1. Clone the Repository
+
+git clone https://github.com/Rajeshkumar1798/NasaExpRepository.git
+cd nasa-explorer
+
+2. Backend Setup
+
+cd backend
+npm install
+# Create a .env file:
+echo "NASA_API_KEY=your_nasa_key" > .env
+echo "JWT_SECRET=your_super_secret_key" >> .env
+node index.js
+
+3. Frontend Setup
+
+cd ../frontend
+npm install
+npm start
+
