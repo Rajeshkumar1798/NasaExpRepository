@@ -1,6 +1,6 @@
 require('dotenv').config();
 const express = require('express');
-const { Configuration, OpenAIApi } = require('openai');
+const OpenAI = require('openai');
 require('dotenv').config();
 const cors = require('cors');
 const axios = require('axios');
@@ -117,23 +117,21 @@ app.get('/api/epic', authenticateToken, async (req, res) => {
 
 
 
-const openai = new OpenAIApi(new Configuration({
+const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
-}));
-
+});
 app.post('/api/ask', async (req, res) => {
   const { question } = req.body;
   try {
-    const completion = await openai.createChatCompletion({
+    const completion = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',
       messages: [{ role: 'user', content: question }],
     });
-    res.json({ answer: completion.data.choices[0].message.content });
+    res.json({ answer: completion.choices[0].message.content });
   } catch (err) {
     console.error(err.message);
     res.status(500).json({ message: 'Failed to fetch AI response' });
   }
 });
-
 
 app.listen(PORT, () => console.log(`🚀 Server running at http://localhost:${PORT}`));
