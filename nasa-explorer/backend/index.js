@@ -1,8 +1,7 @@
 require('dotenv').config();
 const express = require('express');
-const OpenAI = require('openai');
-const cors = require('cors');
 const axios = require('axios');
+const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
@@ -27,9 +26,9 @@ app.use(cors({
 
 app.use(express.json());
 
-const users = []; // In-memory storage
+const users = [];
 
-// 🔐 Middleware to verify token
+
 function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
   const token = authHeader?.split(' ')[1];
@@ -42,24 +41,23 @@ function authenticateToken(req, res, next) {
   });
 }
 
-// ✅ Health check route
+
 app.get('/', (req, res) => {
-  res.send('🚀 NASA Explorer Backend is live!');
+  res.send('🚀 NASA Explorer Backend is live with OpenRouter AI!');
 });
 
-// 📝 Signup
+
 app.post('/api/signup', async (req, res) => {
   const { username, password } = req.body;
   if (users.find(u => u.username === username)) {
     return res.status(400).json({ message: 'User already exists' });
   }
-
   const hashedPassword = await bcrypt.hash(password, 10);
   users.push({ username, password: hashedPassword });
   res.status(201).json({ message: 'User registered successfully' });
 });
 
-// 🔐 Login
+
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
   const user = users.find(u => u.username === username);
@@ -72,7 +70,7 @@ app.post('/api/login', async (req, res) => {
   res.json({ token });
 });
 
-// 🛰️ APOD (Public)
+
 app.get('/api/apod', async (req, res) => {
   try {
     const response = await axios.get(
@@ -85,7 +83,7 @@ app.get('/api/apod', async (req, res) => {
   }
 });
 
-// 🪐 Mars (Public)
+
 app.get('/api/mars', async (req, res) => {
   try {
     const date = req.query.date || '2024-01-01';
@@ -114,14 +112,7 @@ app.get('/api/epic', authenticateToken, async (req, res) => {
   }
 });
 
-
-
-
-// ✅ OPENAI SETUP using version 5.7.0
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
+// 🤖 Ask AI (via OpenRouter)
 app.post('/api/ask', async (req, res) => {
   const { question } = req.body;
 
@@ -130,17 +121,26 @@ app.post('/api/ask', async (req, res) => {
   }
 
   try {
-    const chatResponse = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
-      messages: [{ role: 'user', content: question }],
-    });
+    const response = await axios.post(
+      'https://openrouter.ai/api/v1/chat/completions',
+      {
+        model: 'openai/gpt-3.5-turbo', // You can switch to claude, mistral, etc.
+        messages: [{ role: 'user', content: question }]
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
 
-    const reply = chatResponse.choices[0].message.content;
+    const reply = response.data.choices[0].message.content;
     res.json({ answer: reply });
   } catch (err) {
-    console.error('Error from OpenAI:', err.message);
+    console.error('OpenRouter API error:', err.message);
     res.status(500).json({ message: 'Failed to fetch AI response', error: err.message });
   }
 });
 
-app.listen(PORT, () => console.log(`🚀 Server running at http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
