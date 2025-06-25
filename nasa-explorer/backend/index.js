@@ -1,5 +1,7 @@
 require('dotenv').config();
 const express = require('express');
+const { Configuration, OpenAIApi } = require('openai');
+require('dotenv').config();
 const cors = require('cors');
 const axios = require('axios');
 const jwt = require('jsonwebtoken');
@@ -113,7 +115,7 @@ app.get('/api/epic', authenticateToken, async (req, res) => {
   }
 });
 
-const { Configuration, OpenAIApi } = require('openai');
+
 
 const openai = new OpenAIApi(new Configuration({
   apiKey: process.env.OPENAI_API_KEY
