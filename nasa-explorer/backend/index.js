@@ -1,7 +1,6 @@
 require('dotenv').config();
 const express = require('express');
 const OpenAI = require('openai');
-require('dotenv').config();
 const cors = require('cors');
 const axios = require('axios');
 const jwt = require('jsonwebtoken');
@@ -117,20 +116,30 @@ app.get('/api/epic', authenticateToken, async (req, res) => {
 
 
 
+
+// ✅ OPENAI SETUP using version 5.7.0
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
+
 app.post('/api/ask', async (req, res) => {
   const { question } = req.body;
+
+  if (!question || question.trim() === '') {
+    return res.status(400).json({ message: 'Question is required' });
+  }
+
   try {
-    const completion = await openai.chat.completions.create({
+    const chatResponse = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',
       messages: [{ role: 'user', content: question }],
     });
-    res.json({ answer: completion.choices[0].message.content });
+
+    const reply = chatResponse.choices[0].message.content;
+    res.json({ answer: reply });
   } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ message: 'Failed to fetch AI response' });
+    console.error('Error from OpenAI:', err.message);
+    res.status(500).json({ message: 'Failed to fetch AI response', error: err.message });
   }
 });
 
