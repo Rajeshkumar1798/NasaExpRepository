@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import './ChatAssistant.css';
 
 export default function ChatAssistant() {
   const [question, setQuestion] = useState('');
