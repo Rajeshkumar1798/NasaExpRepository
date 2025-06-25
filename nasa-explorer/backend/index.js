@@ -119,7 +119,7 @@ app.get('/api/epic', authenticateToken, async (req, res) => {
 
 // ✅ OPENAI SETUP using version 5.7.0
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 app.post('/api/ask', async (req, res) => {
