@@ -3,6 +3,7 @@ import Tabs from './components/Tabs';
 import ApodDisplay from './components/ApodDisplay';
 import MarsRoverPhotos from './components/MarsRoverPhotos';
 import EpicDisplay from './components/EpicDisplay';
+import ChatAssistant from './components/ChatAssistant';
 import Login from './components/Login';
 import Signup from './components/Signup';
 import './App.css';
@@ -81,6 +82,7 @@ function App() {
       {active === 'APOD' && <ApodDisplay />}
       {active === 'Mars' && <MarsRoverPhotos />}
       {active === 'EPIC' && <EpicDisplay token={token} />}
+      <ChatAssistant />
     </div>
   );
 }

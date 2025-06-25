@@ -113,4 +113,25 @@ app.get('/api/epic', authenticateToken, async (req, res) => {
   }
 });
 
+const { Configuration, OpenAIApi } = require('openai');
+
+const openai = new OpenAIApi(new Configuration({
+  apiKey: process.env.OPENAI_API_KEY
+}));
+
+app.post('/api/ask', async (req, res) => {
+  const { question } = req.body;
+  try {
+    const completion = await openai.createChatCompletion({
+      model: 'gpt-3.5-turbo',
+      messages: [{ role: 'user', content: question }],
+    });
+    res.json({ answer: completion.data.choices[0].message.content });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ message: 'Failed to fetch AI response' });
+  }
+});
+
+
 app.listen(PORT, () => console.log(`🚀 Server running at http://localhost:${PORT}`));
